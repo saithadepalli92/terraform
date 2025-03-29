@@ -1,0 +1,35 @@
+name: terraform/apply
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        env:
+          TERRAFORM_ROLE: ${{ secrets.TERRAFORM_ROLE }}
+          TERRAFORM_SSH_KEY: ${{ secrets.TERRAFORM_SSH_KEY }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+          ARM_ENVIRONMENT: ${{ secrets.ARM_ENVIRONMENT }}
+        run: terraform apply -auto-approve
